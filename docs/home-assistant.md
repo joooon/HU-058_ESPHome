@@ -178,6 +178,69 @@ Reordering the list preserves the saved selection. Removing the selected zone
 returns to **Home Assistant**. Timezone rules are bundled at build time, so a
 future legal change to daylight-saving rules requires a new firmware build.
 
+### Updating timezone rules
+
+The regional choices use the IANA timezone database from the Python `tzdata`
+package in the environment that builds the firmware. ESPHome converts that data
+into rules stored on the clock. The clock does not download database updates.
+Normal spring and autumn daylight-saving transitions happen automatically;
+these steps are only needed when a region changes its offset or DST rules.
+
+For a local installation, activate the same Python virtual environment you use
+to build ESPHome. From `firmware/esphome`, update the database, rebuild, and
+upload:
+
+```bash
+python -m pip install --upgrade tzdata
+python -m pip show tzdata
+esphome clean clock.yaml
+esphome compile clock.yaml
+esphome upload clock.yaml --device wifi-clock.local
+```
+
+The new `tzdata` release must contain the rule change. Updating the package alone
+does not update the clock: compilation and upload are both required. The saved
+timezone selection is retained. Substitute the clock's IP address if its
+`.local` hostname does not resolve.
+
+If you build through the ESPHome Device Builder dashboard, update the add-on or
+container to a release that includes the corrected `tzdata`, then use **Clean
+Build Files** and **Install** for the clock. Updating `tzdata` on a different
+computer, or updating Home Assistant alone, does not change the regional rules
+bundled into this firmware.
+
+The **Home Assistant** selection is different: it receives Home Assistant's
+configured timezone during time synchronization. Keep Home Assistant updated
+to receive corrected rules for that mode. The separately selected regions and
+the boot fallback in `secrets.yaml` still use rules bundled into the firmware.
+
+## Angles
+
+Shared by `set_gradient` and by the effect spread.
+No content
+No content
+No content
+# Gitignore settings for ESPHome
+# This is an example and may include too much for your use-case.
+# You can modify this file to suit your needs.
+/.esphome/
+/secrets.yaml
+No content
+See `../../docs/home-assistant.md#timezone` for the available choices and how to
+customize the list.
+
+If a region changes its timezone or daylight-saving rules, update the build
+environment's `tzdata` package and rebuild and upload the firmware. Normal
+seasonal DST transitions need no update. See
+[Updating timezone rules](../../docs/home-assistant.md#updating-timezone-rules)
+for local and dashboard build instructions.
+
+## Build and flash
+
+```
+Filter files
+
+
 ## Angles
 
 Shared by `set_gradient` and by the effect spread.
